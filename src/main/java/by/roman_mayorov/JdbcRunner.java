@@ -1,5 +1,7 @@
 package by.roman_mayorov;
 
+import by.roman_mayorov.dao.ClientDao;
+import by.roman_mayorov.entity.Client;
 import by.roman_mayorov.utils.ConnectionManager;
 
 import java.sql.*;
@@ -10,6 +12,14 @@ public class JdbcRunner {
     public static void main(String[] args){
         System.out.println(getBookByAuthorName("ЛЕВ ТОЛСТОЙ"));
         System.out.println(getAllById(13L));
+
+        var clientDao = ClientDao.getInstance();
+        Client client = new Client();
+        client.setFirstName("Mike");
+        client.setLastName("Vazovski");
+        client.setAge(10);
+        clientDao.save(client);
+        clientDao.delete(client.getId());
     }
 
     public static List<String> getBookByAuthorName(String authorName){
