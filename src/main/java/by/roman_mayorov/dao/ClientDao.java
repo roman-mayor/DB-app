@@ -7,6 +7,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class ClientDao {
     private static final ClientDao INSTANCE = new ClientDao();
@@ -22,18 +27,28 @@ public class ClientDao {
             DELETE FROM clients WHERE id = ?;
             """;
 
+    private final static String SQL_FIND_ALL =
+            """
+             SELECT first_name, last_name, age, id FROM clients;
+             """;
+
+    private final static String SQL_FIND_BY_ID =
+            """
+                    SELECT first_name, last_name, age, id FROM clients WHERE id = ?;
+                    """;
+
     public Client save(Client client){
         try(var connection = ConnectionManager.open();
-            var statement = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)){
+            var statement = connection.prepareStatement(SAVE_SQL, RETURN_GENERATED_KEYS)){
             statement.setString(1, client.getFirstName());
             statement.setString(2, client.getLastName());
             statement.setInt(3, client.getAge());
+            statement.executeUpdate();
 
             ResultSet resultSet = statement.getGeneratedKeys();
 
             if(resultSet.next()) client.setId(resultSet.getLong("id"));
 
-            statement.executeUpdate();
         }catch (SQLException e){
             e.printStackTrace();
         }
@@ -48,6 +63,44 @@ public class ClientDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<Client> findAll() {
+        List<Client> clients = new ArrayList<>();
+        try (var connection = ConnectionManager.open();
+             var statement = connection.prepareStatement(SQL_FIND_ALL)){
+            var resultSet =  statement.executeQuery();
+            while(resultSet.next()){
+                clients.add(
+                        buildClient(resultSet));
+            }
+            return clients;
+        } catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Optional<Client> findById(Long id) {
+        try(var connection = ConnectionManager.open();
+        var statement = connection.prepareStatement(SQL_FIND_BY_ID)){
+            statement.setLong(1, id);
+            var resultSet =  statement.executeQuery();
+            Client client = null;
+            if (resultSet.next()) {
+                client = buildClient(resultSet);
+            }
+            return Optional.ofNullable(client);
+        } catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Client buildClient(ResultSet resultSet) throws SQLException {
+        return new Client(
+                resultSet.getString("first_name"),
+                resultSet.getString("last_name"),
+                resultSet.getInt("age"),
+                resultSet.getLong("id"));
     }
 
     public static ClientDao getInstance() {

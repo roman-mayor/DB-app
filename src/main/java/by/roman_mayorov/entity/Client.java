@@ -4,18 +4,19 @@ import java.util.Objects;
 
 public class Client {
 
-    private Long id;
+
     private String firstName;
     private String lastName;
     private int age;
-
+    private Long id;
     public Client() {}
 
-    public Client(Long id, String firstName, String lastName, int age) {
-        this.id = id;
+    public Client(String firstName, String lastName, int age, Long id) {
+
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
+        this.id = id;
     }
 
     public Long getId() {
