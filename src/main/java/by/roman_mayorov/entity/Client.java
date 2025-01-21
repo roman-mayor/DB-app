@@ -4,7 +4,6 @@ import java.util.Objects;
 
 public class Client {
 
-
     private String firstName;
     private String lastName;
     private int age;

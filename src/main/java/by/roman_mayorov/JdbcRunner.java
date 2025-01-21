@@ -1,6 +1,7 @@
 package by.roman_mayorov;
 
 import by.roman_mayorov.dao.ClientDao;
+import by.roman_mayorov.dto.ClientDto;
 import by.roman_mayorov.dto.ClientFilter;
 
 public class JdbcRunner {
