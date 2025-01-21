@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
-public class ClientDao {
+public class ClientDao implements Dao{
     private static final ClientDao INSTANCE = new ClientDao();
 
     private final static String SAVE_SQL =
